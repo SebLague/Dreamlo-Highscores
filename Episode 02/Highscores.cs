@@ -9,21 +9,25 @@ public class Highscores : MonoBehaviour {
 
 	DisplayHighscores highscoreDisplay;
 	public Highscore[] highscoresList;
+	static Highscores instance;
 	
 	void Awake() {
 		highscoreDisplay = GetComponent<DisplayHighscores> ();
+		instance = this;
 	}
 
-	public void AddNewHighscore(string username, int score) {
-		StartCoroutine(UploadNewHighscore(username,score));
+	public static void AddNewHighscore(string username, int score) {
+		instance.StartCoroutine(instance.UploadNewHighscore(username,score));
 	}
 
 	IEnumerator UploadNewHighscore(string username, int score) {
 		WWW www = new WWW(webURL + privateCode + "/add/" + WWW.EscapeURL(username) + "/" + score);
 		yield return www;
 
-		if (string.IsNullOrEmpty(www.error))
+		if (string.IsNullOrEmpty(www.error)) {
 			print ("Upload Successful");
+			DownloadHighscores();
+		}
 		else {
 			print ("Error uploading: " + www.error);
 		}
